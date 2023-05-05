@@ -1,3 +1,5 @@
+![koi fish](./public/logo.png)
+
 # KASH
 
 its a cassless system in blockchain
