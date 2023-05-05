@@ -2,22 +2,17 @@
 pragma solidity ^0.8.9;
 
 // Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "hardhat/console.sol";
 
-contract Lock {
+contract KashToken is ERC20 {
     uint public unlockTime;
     address payable public owner;
 
     event Withdrawal(uint amount, uint when);
 
-    constructor(uint _unlockTime) payable {
-        require(
-            block.timestamp < _unlockTime,
-            "Unlock time should be in the future"
-        );
-
-        unlockTime = _unlockTime;
-        owner = payable(msg.sender);
+    constructor(uint256 initialSupply) ERC20("KashToken","KSH") {
+        _mint(msg.sender,initialSupply*(10**decimals()));
     }
 
     function withdraw() public {
