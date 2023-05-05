@@ -20,6 +20,6 @@ deploy
 
 ```shell
 npx hardhat run scripts/deploy.js --network mumbai
-npx hardhat verify --network mumbai 0x45785b2560028D0b0aF9A7c678Ab5c82134E49A0 100000
+npx hardhat verify --network mumbai <smart_contract_address> 100000
 
 ```
