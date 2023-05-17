@@ -18,7 +18,17 @@
     "typechain": "^8.1.0"
   },
   "dependencies": {
+    "@chainlink/contracts": "^0.6.1",
+    "@chainlink/env-enc": "^1.0.5",
     "@openzeppelin/contracts": "^4.8.3",
-    "dotenv": "^16.0.3"
+    "@openzeppelin/contracts-upgradeable": "^4.8.3",
+    "axios": "^1.4.0",
+    "defender-relay-client": "^1.43.0",
+    "dotenv": "^16.0.3",
+    "eth-crypto": "^2.6.0",
+    "is-http-url": "^2.0.0",
+    "npm": "^9.6.6",
+    "prompt-sync": "^4.2.0",
+    "vm2": "^3.9.18"
   }
 }

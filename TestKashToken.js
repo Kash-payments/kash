@@ -15,8 +15,6 @@ const eip712DomainTypeDefinition = [
 const metaTxTypeDefinition = [
   { name: "from", type: "address" },
   { name: "to", type: "address" },
-  { name: "value", type: "uint256" },
-  { name: "gas", type: "uint256" },
   { name: "nonce", type: "uint256" },
   { name: "data", type: "bytes" },
 ];
@@ -51,7 +49,7 @@ describe("Kash token test", () => {
 
     const KashToken = await ethers.getContractFactory("KashToken");
     const KashTokenForwarder = await ethers.getContractFactory(
-      "MinimalForwarder"
+      "KashTokenForwarder"
     );
 
     kashTokenForwarder = await KashTokenForwarder.deploy();
@@ -59,8 +57,7 @@ describe("Kash token test", () => {
 
     this.kashToken = await KashToken.deploy(
       initialSupply,
-      kashTokenForwarder.address,
-      deployer.address
+      kashTokenForwarder.address
     );
     await this.kashToken.deployed();
   });
@@ -89,6 +86,9 @@ describe("Kash token test", () => {
     const forwarderContractTmpInstance = await kashTokenForwarder.connect(
       relayerAccount
     );
+    console.log("deployer", deployer.address);
+    console.log("reciverAccount", receiverAccount.address);
+    console.log("releyerAccount", relayerAccount.address);
 
     const { chainId } = await relayerAccount.provider.getNetwork();
     const userAccountA = deployer;
@@ -110,29 +110,32 @@ describe("Kash token test", () => {
 
     const totalAmountToTransfer = ethers.BigNumber.from(1).mul(
       ethers.BigNumber.from(10).pow(10)
-      // Meta transaction values
     );
+    // Meta transaction values
     const messageValues = {
-      from: userAccountA.address, //Using user address
-      to: this.kashToken.address, // to token contract address
-      value: 0,
-      gas: 1e6,
-      nonce: deployerCurrentNonce.toString(), // actual nonce for user
+      from: "0x51e7341e70436b92F711C8A43Af882010eDeae48", //Using user address
+      to: "0x4a947a1Ba03D9dbaEc8BE9E9f109Cb4AdDC6a330", // to token contract address
+      nonce: "0", // actual nonce for user
       data: this.kashToken.interface.encodeFunctionData("transfer", [
-        userAccountB.address,
+        "0x162198beA1Cf8a9d04651dE8465Cb30Cd57d2468",
         totalAmountToTransfer,
       ]), // encoding function call for "transfer(address _to, uint256 amount)"
     };
+    const hardcoded = this.kashToken.interface.encodeFunctionData("transfer", [
+      "0x162198beA1Cf8a9d04651dE8465Cb30Cd57d2468",
+      totalAmountToTransfer,
+    ]);
+    console.log("hardcoded", hardcoded);
 
     // Gettting typed Data so our Meta-Tx structura can be signed
     const typedData = getTypedData({
       domainValues: {
-        name: "MinimalForwarder",
+        name: "KashTokenForwarder",
         version: "0.0.1",
         chainId: chainId,
-        verifyingContract: kashTokenForwarder.address,
+        verifyingContract: "0x715637106802084DE28811d2432e19eb4C68550d",
       },
-      primaryType: "ForwardRequest",
+      primaryType: "MetaTx",
       messageValues,
     });
 
@@ -141,18 +144,17 @@ describe("Kash token test", () => {
       userAccountA.address,
       typedData,
     ]);
-    console.log(messageValues);
-    console.log(signedMessage);
     const deployerBalance = await this.kashToken.balanceOf(deployer.address);
+    console.log(typedData);
+
+    console.log("hola", JSON.stringify(messageValues));
+    console.log("test", signedMessage);
 
     // executing transaction
-    await forwarderContractTmpInstance.execute(messageValues, signedMessage);
-    console.log("----");
-    const verify = await forwarderContractTmpInstance.verify(
+    await forwarderContractTmpInstance.executeFunction(
       messageValues,
       signedMessage
     );
-    console.log("verify ext", verify);
 
     // Getting user and relayer ETH balance before transaction
     const userAccountAEthersAfterTx = await userAccountA.getBalance();

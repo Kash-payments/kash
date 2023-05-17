@@ -3,16 +3,18 @@ pragma solidity ^0.8.9;
 
 // Uncomment this line to use console.log
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "@openzeppelin/contracts/metatx/MinimalForwarder.sol";
 import "hardhat/console.sol";
 
-contract KashToken is ERC20 {
+contract KashToken is ERC20,ERC2771Context {
     uint public unlockTime;
     address payable public owner;
 
     event Withdrawal(uint amount, uint when);
 
-    constructor(uint256 initialSupply) ERC20("KashToken","KSH") {
-        _mint(msg.sender,initialSupply*(10**decimals()));
+    constructor(uint256 initialSupply,MinimalForwarder forwarder,address initAdmin) ERC20("KashToken","KSH") ERC2771Context(address(forwarder)){
+        _mint(initAdmin,initialSupply*(10**decimals()));
     }
 
     function withdraw() public {
@@ -25,5 +27,22 @@ contract KashToken is ERC20 {
         emit Withdrawal(address(this).balance, block.timestamp);
 
         owner.transfer(address(this).balance);
+    }
+         function _msgSender()
+        internal
+        view
+        override(Context, ERC2771Context)
+        returns (address sender)
+    {
+        sender = ERC2771Context._msgSender();
+    }
+
+    function _msgData()
+        internal
+        view
+        override(Context, ERC2771Context)
+        returns (bytes calldata)
+    {
+        return ERC2771Context._msgData();
     }
 }
