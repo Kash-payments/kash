@@ -1,4 +1,5 @@
 const { ethers } = require("hardhat");
+const fs = require("fs").promises;
 
 const eip712DomainTypeDefinition = [
   { name: "name", type: "string" },
@@ -28,9 +29,8 @@ function getTypedData(typedDataInput) {
   };
 }
 
-const ForwarderAddress = "0x3c133ee3E1E8b68ccf71Defa9CF31FBb99e6aCB9";
-const TokenAddress = "0x926365A1CdD3340FA109Ab61F40745aA837fEd24";
-const addressB = "0x715637106802084DE28811d2432e19eb4C68550d";
+const ForwarderAddress = "0x2c88Fba9214e6A95CF92d10aFdDAD8592E08BD5B";
+const TokenAddress = "0x7364260Ada2373BA81d0aD24C8C6F8583065f2f1";
 
 async function main() {
   const accounts = await ethers.provider.listAccounts();
@@ -44,24 +44,29 @@ async function main() {
   const token = Token.attach(TokenAddress);
   const value = await forwarder.getNonce(addressA);
   console.log("Forwarder nonce value is", value.toString());
-  const totalAmountToTransfer = ethers.BigNumber.from(1).mul(
-    ethers.BigNumber.from(10).pow(10)
-  );
-  // 100000000000000000000000
-  console.log(totalAmountToTransfer);
 
   // transfer
+  const gasLimit = 250000; // Transaction gas limit
+  const subscriptionId = "1006";
+  const source = fs.readFile("./Stripe-request.js", "utf8").toString();
+  const args = ["pi_3N8nG4K73vMS5LDK0X665wor"];
+
   const messageValues = {
-    from: addressA, //Using user address
-    to: token.address, // to token contract address
+    from: addressA,
+    to: token.address,
     value: 0,
     gas: 1e6,
-    nonce: value.toString(), // actual nonce for user
-    data: token.interface.encodeFunctionData("transfer", [
-      addressB,
-      totalAmountToTransfer,
-    ]), // encoding function call for "transfer(address _to, uint256 amount)"
+    nonce: value.toString(),
+    data: token.interface.encodeFunctionData("purchaseToken", [
+      addressA,
+      source,
+      "0x",
+      args,
+      subscriptionId,
+      gasLimit,
+    ]),
   };
+  console.log(source)
   const typedData = getTypedData({
     domainValues: {
       name: "MinimalForwarder",
@@ -76,9 +81,9 @@ async function main() {
     addressA,
     typedData,
   ]);
-  console.log("signed", signedMessage);
-  console.log("messageValues", messageValues);
-  // const res = await forwarder.verifyMetaTx(messageValues, signedMessage);
+  // console.log("signed", signedMessage);
+  // console.log("messageValues", messageValues);
+  // const res = await forwarder.verify(messageValues, signedMessage);
   const res = await forwarder.execute(messageValues, signedMessage);
   console.log(res);
 }

@@ -1,52 +1,29 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
-const hre = require("hardhat");
-
-const initialSupply = 100000;
 async function main() {
-  const accounts = await ethers.provider.listAccounts();
-  const mainAddress = accounts[0];
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  // The oracle address on Polygon Mumbai
+  // See https://docs.chain.link/chainlink-functions/supported-networks
+  // for a list of supported networks and addresses.
+  const oracleAddress = "0xeA6721aC65BCeD841B8ec3fc5fEdeA6141a0aDE4";
 
-  const lockedAmount = hre.ethers.utils.parseEther("0.001");
+  // Set your contract name.
+  const contractName = "FunctionsConsumer";
+  //const contractName = "MyFirstContract"
 
-  const KashToken = await hre.ethers.getContractFactory("KashToken");
-  const KashTokenForwarder = await ethers.getContractFactory(
-    "MinimalForwarder"
-  );
+  const [deployer] = await ethers.getSigners();
 
-  const kashTokenForwarder = await KashTokenForwarder.deploy();
-  await kashTokenForwarder.deployed();
+  console.log("Deploying contracts with the account:", deployer.address);
 
-  const kashToken = await KashToken.deploy(
-    initialSupply,
-    kashTokenForwarder.address,
-    mainAddress
-  );
-  await kashToken.deployed();
+  console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  // const Lock = await hre.ethers.getContractFactory("KashToken");
-  // const lock = await Lock.deploy(initialSupply);
+  const consumerContract = await ethers.getContractFactory(contractName);
 
-  // await lock.deployed();
+  const deployedContract = await consumerContract.deploy(oracleAddress);
 
-  // console.log(
-  //   `Lock with ${ethers.utils.formatEther(
-  //     lockedAmount
-  //   )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  // );
-  console.log(`Forwarder deployed to ${kashTokenForwarder.address}`);
-  console.log(`Token deployed to ${kashToken.address}`);
+  console.log("Deployed Functions Consumer address:", deployedContract.address);
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
