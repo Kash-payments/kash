@@ -3,18 +3,17 @@ pragma solidity ^0.8.9;
 
 // Uncomment this line to use console.log
 import {Functions, FunctionsClient} from "./dev/functions/FunctionsClient.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "hardhat/console.sol";
 
-contract KashToken is ERC20,FunctionsClient {
+contract KashToken is ERC20,FunctionsClient,ERC2771Context  {
   using Functions for Functions.Request;
 
   bytes32 public latestRequestId;
   bytes public latestResponse;
   bytes public latestError;
   string private latestUserRequestedId;
-
-  enum OperationsTypes{ TOKEN_PURCHASE, MEDIUM, LARGE }
 
   struct User {
     string name;
@@ -30,21 +29,18 @@ contract KashToken is ERC20,FunctionsClient {
 
   error RecordLabel_UserPaymentError(string userId, uint256 payment, string errorMsg);
 
-  constructor(uint256 initialSupply,address oracle) ERC20("KashToken","KSH") FunctionsClient(oracle){
-    _mint(msg.sender,initialSupply*(10**decimals()));
+  constructor(address forwarder,address oracle) ERC20("KashToken","KSH") ERC2771Context(address(forwarder)) FunctionsClient(oracle){
   }
 
   function setUserData(
     string memory userId,
     string memory name,
     string memory email,
-    uint256 lastPaidAmount,
     address walletAddress
   ) public {
     userData[userId].userId = userId;
     userData[userId].name = name;
     userData[userId].email = email;
-    userData[userId].lastPaidAmount = lastPaidAmount;
     userData[userId].walletAddress = walletAddress;
   }
 
@@ -93,5 +89,22 @@ contract KashToken is ERC20,FunctionsClient {
     latestUserRequestedId=args[0];
     return assignedReqID;
   }
+       function _msgSender()
+        internal
+        view
+        override(Context, ERC2771Context)
+        returns (address sender)
+    {
+        sender = ERC2771Context._msgSender();
+    }
+
+    function _msgData()
+        internal
+        view
+        override(Context, ERC2771Context)
+        returns (bytes calldata)
+    {
+        return ERC2771Context._msgData();
+    }
 
 }
