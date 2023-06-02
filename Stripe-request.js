@@ -1,5 +1,5 @@
-const pi = args[0];
-const url = `https://api.stripe.com/v1/payment_intents/${pi}`;
+const pi = args[1];
+const url = `https://api.stripe.com/v1/checkout/sessions/${pi}`;
 // console.log(`Get name, capital and currency for country code: ${countryCode}`)
 console.log(`HTTP POST Request to ${url}`);
 const countryRequest = Functions.makeHttpRequest({
@@ -35,5 +35,8 @@ const result = {
 
 // Use JSON.stringify() to convert from JSON object to JSON string
 // Finally, use the helper Functions.encodeString() to encode from string to bytes
-return Functions.encodeUint256(countryData.amount / 100);
+return Buffer.concat([
+  Functions.encodeUint256(0),
+  Functions.encodeUint256(countryData.amount_total / 100)
+])
 // return Functions.encodeString(JSON.stringify(result))

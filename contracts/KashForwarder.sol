@@ -37,29 +37,10 @@ contract KashTokenForwarder is EIP712 {
         view
         returns (bool)
     {
-        // bytes32 digest = _hashTypedDataV4(
-        //     keccak256(
-        //         abi.encode(
-        //             // hashStruct(s)
-        //             _SIGNATURE_STRUCT_HASH,
-        //             metaTx.from,
-        //             metaTx.to,
-        //             metaTx.nonce,
-        //             keccak256(metaTx.data)
-        //         )
-        //     )
-        // );
         address signer = _hashTypedDataV4(
             keccak256(abi.encode(_SIGNATURE_STRUCT_HASH, metaTx.from, metaTx.to, metaTx.nonce, keccak256(metaTx.data)))
         ).recover(signature);
 
-        // address metaTxSigner = ECDSA.recover(digest, signature);
-        // console.log("from",metaTx.from);
-        // console.log("to",metaTx.to);
-        // console.log("nonce",metaTx.nonce);
-        console.log("signer in contract",signer);
-        // Verifying signer does match
-        // return metaTxSigner == metaTx.from;
         return signer == metaTx.from;
     }
 

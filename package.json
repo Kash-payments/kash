@@ -22,6 +22,7 @@
     "@chainlink/env-enc": "^1.0.5",
     "@openzeppelin/contracts": "^4.8.3",
     "@openzeppelin/contracts-upgradeable": "^4.8.3",
+    "alchemy-sdk": "^2.8.3",
     "axios": "^1.4.0",
     "defender-relay-client": "^1.43.0",
     "dotenv": "^16.0.3",

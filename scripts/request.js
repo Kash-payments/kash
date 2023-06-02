@@ -15,7 +15,7 @@ async function main() {
   const signer = new ethers.Wallet(signerPrivateKey, provider);
 
   // Consumer contract
-  const consumerAddress = "0xB0f0B8161FcAA2387E8df273c154c56faC3F5bB9";
+  const consumerAddress = "0xCa3a16De47bBd47C29322bF95a690A4be51602dE";
   const consumerAbiPath = "./artifacts/contracts/KashToken.sol/KashToken.json";
 
   const contractAbi = JSON.parse(
@@ -28,18 +28,52 @@ async function main() {
   );
 
   // Transaction config
-  const gasLimit = 250000; // Transaction gas limit
+  const gasLimit = 300000; // Transaction gas limit
   const verificationBlocks = 2; // Number of blocks to wait for transaction
 
   // Chainlink Functions request config
   // Chainlink Functions subscription ID
-  const subscriptionId = "1006";
+  const subscriptionId = "1068";
   // Gas limit for the Chainlink Functions request
   const requestGas = 5500000;
 
+
   // Default example
-  const source = await fs.readFile("./Stripe-request.js", "utf8");
-  const args = ["pi_3N8nG4K73vMS5LDK0X665wor"];
+  const source = `
+  const pi = args[1];
+  const url = "https://api.stripe.com/v1/checkout/sessions/"+pi;
+  const countryRequest = Functions.makeHttpRequest({
+    url: url,
+    method: 'GET',
+    headers: {
+      authorization: 'Basic c2tfdGVzdF81MU40VTY0Szczdk1TNUxES1V5Y0tUeVR4TTNMbFVDUlNwMzh0aFFTYVdBTVBqbzg0bzZ1VFozQ2hNSUF6M21iR05nc3ZKeEVwMkhVbVBobk5hbW82S2g4MDAwaE9VQ3hvdEY6',
+    },
+  });
+  // Execute the API request (Promise)
+  const countryResponse = await countryRequest;
+  console.log(countryResponse);
+  if (countryResponse.error) {
+    console.log('falla');
+    throw Error('Request failed');
+  }
+  const countryData = countryResponse['data'];
+  console.log(countryData);
+  // result is in JSON object
+  const result = {
+    name: countryData.id,
+    capital: countryData.amount,
+    currency: countryData.currency,
+  };
+  // Use JSON.stringify() to convert from JSON object to JSON string
+  // Finally, use the helper Functions.encodeString() to encode from string to bytes
+  return Buffer.concat([
+    Functions.encodeUint256(0),
+    Functions.encodeUint256(countryData.amount_total / 100)
+  ]);
+  `
+  // const source = await fs.readFile("./Stripe-request.js", "utf8");
+  console.log(source)
+  const args = ["123", "cs_test_a1PwVlPtXWLQsX1OESLzDR8t7jMuGZNkXCdlueGrWuN6q01CxkSKsg161F"];
   console.log("source")
 
   // Tutorial 6
@@ -156,6 +190,7 @@ async function main() {
             "Error encountered when calling fulfillRequest in client contract.\n" +
             "Ensure the fulfillRequest function in the client contract is correct and the --gaslimit is sufficient."
           );
+          console.log(result)
           console.error(`${msg}\n`);
         } else if (result.userCallbackRawError) {
           console.error(
