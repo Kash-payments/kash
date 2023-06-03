@@ -128,11 +128,11 @@ export default class SpaceAndTimeSDK {
     let signature = this.generateSignature(authCodeResponse, privateKeyUint);
 
     let [tokenResponse, tokenError] = await this.#generateToken(userId, authCodeResponse, signature, publicKey, scheme);
+    console.log(tokenError)
     if (tokenError) throw new Error(tokenError);
 
     let accessToken = tokenResponse.accessToken, refreshToken = tokenResponse.refreshToken;
     let accessTokenExpires = tokenResponse.accessTokenExpires, refreshTokenExpires = tokenResponse.refreshTokenExpires
-    console.log(accessToken)
     this.writeToFile(accessToken, refreshToken, accessTokenExpires, refreshTokenExpires)
 
     // Writing values of Public and Private key to ENV.
