@@ -138,8 +138,8 @@ export default class SpaceAndTimeSDK {
     this.writeToFile(accessToken, refreshToken, accessTokenExpires, refreshTokenExpires)
 
     // Writing values of Public and Private key to ENV.
-    this.setEnvValue("PUBLICKEY", publicKey);
-    this.setEnvValue("PRIVATEKEY", privateKey);
+    // this.setEnvValue("PUBLICKEY", publicKey);
+    // this.setEnvValue("PRIVATEKEY", privateKey);
 
     return [tokenResponse, tokenError];
   }
