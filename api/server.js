@@ -8,6 +8,8 @@ const port = 3000
 app.use(bodyParser.json())
 const initSDK = SpaceAndTimeSDK.init();
 
+console.log(process.env)
+
 app.get('/payments', async (req, res) => {
   await getToken()
   let token = initSDK.retrieveFileContents().accessToken
