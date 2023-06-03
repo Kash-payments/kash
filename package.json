@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "description": "Tooling for interacting with Chainlink Functions",
   "scripts": {
+    "start": "node api/server.js",
     "prepare": "husky install",
     "compile": "hardhat compile",
     "test": "npm run test:unit",
