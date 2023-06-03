@@ -132,7 +132,7 @@ export default class SpaceAndTimeSDK {
 
     let accessToken = tokenResponse.accessToken, refreshToken = tokenResponse.refreshToken;
     let accessTokenExpires = tokenResponse.accessTokenExpires, refreshTokenExpires = tokenResponse.refreshTokenExpires
-
+    console.log(accessToken)
     this.writeToFile(accessToken, refreshToken, accessTokenExpires, refreshTokenExpires)
 
     // Writing values of Public and Private key to ENV.
