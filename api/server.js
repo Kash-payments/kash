@@ -19,10 +19,8 @@ app.get('/payments', async (req, res) => {
 })
 
 app.post('/payments', async (req, res) => {
-  await getToken()
-  console.log("token", token)
-  let token = initSDK.retrieveFileContents().accessToken
-  const result = await transactions.insert(token, req.body)
+  let [tokenResponse, tokenError] = await initSDK.AuthenticateUser();
+  const result = await transactions.insert(tokenResponse.accessToken, req.body)
   return res.json(result)
 })
 
