@@ -12,7 +12,7 @@ const initSDK = SpaceAndTimeSDK.init();
 app.get('/payments', async (req, res) => {
   // await getToken()
   let [tokenResponse, tokenError] = await initSDK.AuthenticateUser();
-  console.log("testtt", tokenResponse, tokenError)
+  console.log("testtt", tokenResponse)
   // let token = initSDK.retrieveFileContents().accessToken
   const result = await transactions.getAll(tokenResponse.accessToken)
   return res.json(result)

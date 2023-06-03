@@ -105,6 +105,8 @@ export default class SpaceAndTimeSDK {
 
     let publicKey = (process.env.PUBLICKEY === undefined) ? mainPublicKey : process.env.PUBLICKEY;
     let privateKey = (process.env.PRIVATEKEY === undefined) ? mainPrivateKey : process.env.PRIVATEKEY;
+    console.log("public", publicKey)
+    console.log("private", privateKey)
 
     let userIdStatus = await this.checkUserIdExistance(userId);
     if (userIdStatus === false) {
