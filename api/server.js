@@ -12,12 +12,14 @@ const initSDK = SpaceAndTimeSDK.init();
 app.get('/payments', async (req, res) => {
   await getToken()
   let token = initSDK.retrieveFileContents().accessToken
+  console.log("token", token)
   const result = await transactions.getAll(token)
   return res.json(result)
 })
 
 app.post('/payments', async (req, res) => {
   await getToken()
+  console.log("token", token)
   let token = initSDK.retrieveFileContents().accessToken
   const result = await transactions.insert(token, req.body)
   return res.json(result)
