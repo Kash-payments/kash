@@ -1,14 +1,9 @@
 {
   "name": "functions-hardhat-starter-kit",
   "license": "MIT",
-  "type": "module",
   "version": "0.1.0",
   "description": "Tooling for interacting with Chainlink Functions",
-  "engines": {
-    "node": ">=18"
-  },
   "scripts": {
-    "start": "node api/server.js",
     "prepare": "husky install",
     "compile": "hardhat compile",
     "test": "npm run test:unit",

@@ -92,20 +92,28 @@ describe("Kash token test", () => {
     const subscriptionId = "1006";
     const source = await fs.readFile("./Stripe-request.js", "utf8");
     const args = ["pi_3N8nG4K73vMS5LDK0X665wor"];
+    const data = kashToken.interface.encodeFunctionData("executeRequest", [
+      source,
+      "0x",
+      args ?? [], // Chainlink Functions request args
+      subscriptionId, // Subscription ID
+      gasLimit, // Gas limit for the transaction
+    ]) // encoding function call for "transfer(address _to, uint256 amount)"
 
+    const data2 = kashToken.interface.encodeFunctionData("setUserData", [
+      "987",
+      "karla",
+      "karla@test", // Chainlink Functions request args
+      "0xe6903fdD3CD0aa2370122761C0D7aBD05D1Ef79C", // Subscription ID
+    ]) // encoding function call for "transfer(address _to, uint256 amount)"
+    console.log(data2)
     const messageValues = {
       from: userAccountA.address, //Using user address
       to: kashToken.address, // to token contract address
       value: 0,
       gas: 1e6,
       nonce: deployerCurrentNonce.toString(), // actual nonce for user
-      data: kashToken.interface.encodeFunctionData("executeRequest", [
-        source,
-        "0x",
-        args ?? [], // Chainlink Functions request args
-        subscriptionId, // Subscription ID
-        gasLimit, // Gas limit for the transaction
-      ]), // encoding function call for "transfer(address _to, uint256 amount)"
+      data // encoding function call for "transfer(address _to, uint256 amount)"
     };
 
     // Gettting typed Data so our Meta-Tx structura can be signed
